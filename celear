@@ -1,0 +1,53 @@
+import os
+import shutil
+
+# Android Download Folder
+folder_to_organize = "/sdcard/Download"
+
+FILE_CATEGORIES = {
+    "Images": [".jpg", ".jpeg", ".png", ".gif", ".bmp"],
+    "Documents": [".pdf", ".docx", ".doc", ".txt", ".xlsx", ".pptx"],
+    "Videos": [".mp4", ".mkv", ".avi", ".mov"],
+    "Music": [".mp3", ".wav"],
+    "Archives": [".zip", ".rar", ".7z"],
+}
+
+def organize_folder(target_folder):
+    if not os.path.exists(target_folder):
+        print("သတ်မှတ်ထားတဲ့ Folder ရှာမတွေ့ပါဘူး သားကြီး!")
+        return
+
+    print("သန့်ရှင်းရေး စတင်လုပ်ဆောင်နေပါပြီ...\n")
+
+    for filename in os.listdir(target_folder):
+        file_path = os.path.join(target_folder, filename)
+
+        if os.path.isdir(file_path):
+            continue
+
+        _, file_extension = os.path.splitext(filename)
+        file_extension = file_extension.lower()
+
+        moved = False
+        for category, extensions in FILE_CATEGORIES.items():
+            if file_extension in extensions:
+                category_path = os.path.join(target_folder, category)
+                
+                if not os.path.exists(category_path):
+                    os.makedirs(category_path)
+
+                shutil.move(file_path, os.path.join(category_path, filename))
+                print(f"ရွှေ့ပြီးပြီ: {filename} -> {category}/")
+                moved = True
+                break
+
+        if not moved and file_extension != "":
+            others_path = os.path.join(target_folder, "Others")
+            if not os.path.exists(others_path):
+                os.makedirs(others_path)
+            shutil.move(file_path, os.path.join(others_path, filename))
+            print(f"ရွှေ့ပြီးပြီ: {filename} -> Others/")
+
+    print("\nသန့်ရှင်းရေး အောင်မြင်စွာ ပြီးဆုံးပါပြီ သားကြီး!")
+
+organize_folder(folder_to_organize)
